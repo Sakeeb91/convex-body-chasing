@@ -15,13 +15,19 @@ Exploratory project for implementing and evaluating online algorithms for the co
 ## Quick demo
 ```python
 import numpy as np
-from convex_body_chasing.bodies import Ball2D
+from convex_body_chasing.bodies import Ball2D, AxisAlignedRectangle, ConvexPolygon
 from convex_body_chasing.algorithms.greedy import follow_the_leader
 
 bodies = [Ball2D(center=(i, 0.0), radius=1.0) for i in range(5)]
 cost, points = follow_the_leader(bodies)
 print(f"Movement cost: {cost:.2f}")
 print("Visited points:", points)
+
+# Other bodies are available:
+rect = AxisAlignedRectangle(min_corner=(0.0, 0.0), max_corner=(2.0, 1.0))
+square = ConvexPolygon(vertices=[(0, 0), (1, 0), (1, 1), (0, 1)])
+print("Rectangle projection of (3, -1):", rect.closest_point(np.array([3.0, -1.0])))
+print("Square contains (0.2, 0.2):", square.contains(np.array([0.2, 0.2])))
 ```
 
 ## Next steps
