@@ -19,8 +19,10 @@
 ## Milestones and Workstreams
 1) **Geometry Primitives**
    - Implement `ConvexBody` protocol with `closest_point` projection and `contains`.
-   - Bodies: `Ball2D`, axis-aligned rectangle, convex polygon (supporting intersection of half-spaces), generic intersection wrapper.
-   - Utilities: distance, movement cost, random body samplers; ensure numerical robustness (eps tolerances).
+- Bodies: `Ball2D`, axis-aligned rectangle, convex polygon (supporting intersection of half-spaces), generic intersection wrapper.
+- Utilities: distance, movement cost, random body samplers; ensure numerical robustness (eps tolerances).
+
+*Progress:* `Ball2D`, `AxisAlignedRectangle`, `ConvexPolygon`, and `Intersection` bodies with projection helpers are in place.
 
 2) **Algorithms**
    - Baseline: FTL via projection (already scaffolded).
