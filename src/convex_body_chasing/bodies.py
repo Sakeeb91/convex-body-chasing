@@ -17,6 +17,17 @@ def _to_point(point: Iterable[float], *, dim: int) -> np.ndarray:
         raise ValueError(f"Expected point of shape ({dim},), got {arr.shape}.")
     return arr
 
+
+def _project_to_segment(point: np.ndarray, start: np.ndarray, end: np.ndarray) -> np.ndarray:
+    """Project a point onto a line segment [start, end]."""
+    segment = end - start
+    denom = float(np.dot(segment, segment))
+    if denom == 0.0:
+        return start
+    t = float(np.dot(point - start, segment) / denom)
+    t_clamped = min(1.0, max(0.0, t))
+    return start + t_clamped * segment
+
 ArrayLikePoint = Iterable[float]
 
 
@@ -90,3 +101,54 @@ class AxisAlignedRectangle(ConvexBody):
         lower = _to_point(self.min_corner, dim=2)
         upper = _to_point(self.max_corner, dim=2)
         return np.clip(pt, lower, upper)
+
+
+@dataclass(frozen=True)
+class ConvexPolygon(ConvexBody):
+    """Convex polygon in R^2 defined by ordered vertices."""
+
+    vertices: Sequence[Tuple[float, float]]
+
+    def __post_init__(self) -> None:
+        verts = np.asarray(self.vertices, dtype=float)
+        if verts.ndim != 2 or verts.shape[1] != 2:
+            raise ValueError("Vertices must be an iterable of (x, y) pairs.")
+        if len(verts) < 3:
+            raise ValueError("ConvexPolygon requires at least three vertices.")
+
+    @property
+    def _verts(self) -> np.ndarray:
+        return np.asarray(self.vertices, dtype=float)
+
+    def _edges(self) -> Sequence[tuple[np.ndarray, np.ndarray]]:
+        v = self._verts
+        return [(v[i], v[(i + 1) % len(v)]) for i in range(len(v))]
+
+    def contains(self, point: np.ndarray) -> bool:  # type: ignore[override]
+        pt = _to_point(point, dim=2)
+        verts = self._verts
+        signs = []
+        for a, b in self._edges():
+            edge = b - a
+            rel = pt - a
+            cross = edge[0] * rel[1] - edge[1] * rel[0]
+            signs.append(cross)
+        return bool(
+            all(s >= -DEFAULT_TOL for s in signs) or all(s <= DEFAULT_TOL for s in signs)
+        )
+
+    def closest_point(self, previous_point: np.ndarray) -> np.ndarray:  # type: ignore[override]
+        pt = _to_point(previous_point, dim=2)
+        if self.contains(pt):
+            return pt
+
+        best_point = None
+        best_distance = float("inf")
+        for a, b in self._edges():
+            candidate = _project_to_segment(pt, a, b)
+            dist = float(np.linalg.norm(candidate - pt))
+            if dist < best_distance:
+                best_distance = dist
+                best_point = candidate
+        assert best_point is not None
+        return best_point
