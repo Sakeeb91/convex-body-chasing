@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "convex-body-chasing"
+version = "0.1.0"
+description = "Implementations and experiments for convex body chasing algorithms."
+authors = [{ name = "Sakeeb Rahman", email = "Rahman.sakeeb@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.26",
+  "matplotlib>=3.8",
+]
+
+[project.urls]
+Homepage = "https://github.com/Sakeeb91/convex-body-chasing"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
