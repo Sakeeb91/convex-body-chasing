@@ -10,7 +10,7 @@ Exploratory project for implementing and evaluating online algorithms for the co
 ## What’s here
 - Minimal package scaffold in `src/convex_body_chasing` with a basic 2D ball body and a greedy follow-the-leader algorithm.
 - Documentation plan lives in `docs/implementation-plan.md` (see after generation).
-- Ready for expansion with additional body types, competitive algorithms, scenario generators, and evaluation plots.
+- Ready for expansion with additional body types, competitive algorithms, scenario generators, and Plotly-based evaluation plots.
 
 ## Quick demo
 ```python

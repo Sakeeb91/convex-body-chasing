@@ -7,7 +7,7 @@
 
 ## Architecture and Stack
 - Language: Python 3.10+.
-- Core libs: `numpy` (vector math), `matplotlib` (visualization), optional `shapely` for polygon ops (guard with extras).
+- Core libs: `numpy` (vector math), `plotly` (interactive visualization), optional `shapely` for polygon ops (guard with extras).
 - Layout: `src/convex_body_chasing` package with submodules:
   - `bodies/`: convex sets (balls, ellipses, half-spaces, intersections, polygons).
   - `algorithms/`: online strategies (FTL/metric projection, competitive algorithms, randomized variants).
@@ -37,7 +37,7 @@
 4) **Evaluation Pipeline**
    - Simulation runner that accepts algorithm + scenario config, emits `RunResult(cost, points, per_step)`.
    - Metrics: cumulative cost over time, per-step displacement, empirical competitive ratio vs. offline optimum (approx via convex program for small horizons).
-   - Visualization: trajectories, body overlays, cost vs. timestep plots; optional animation/gif export.
+   - Visualization: trajectories, body overlays, cost vs. timestep plots via Plotly; optional HTML exports and gif/video renders.
    - Reporting: notebook/template summarizing wins/failure modes with saved figures.
 
 5) **LLM Collaboration (Optional)**
