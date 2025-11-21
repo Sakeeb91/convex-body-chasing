@@ -28,6 +28,38 @@ def _project_to_segment(point: np.ndarray, start: np.ndarray, end: np.ndarray) -
     t_clamped = min(1.0, max(0.0, t))
     return start + t_clamped * segment
 
+
+def project_onto_intersection(
+    bodies: Sequence[ConvexBody],
+    start: np.ndarray,
+    *,
+    tol: float = DEFAULT_TOL,
+    max_iters: int = 50,
+) -> np.ndarray:
+    """
+    Alternating projections onto a finite intersection of convex bodies.
+
+    For convex sets with nonempty intersection this converges; we cap iterations
+    and return the latest iterate (which will typically lie in the intersection
+    for well-behaved sets).
+    """
+    if not bodies:
+        raise ValueError("At least one body is required for intersection.")
+
+    point = np.asarray(start, dtype=float)
+    if point.ndim != 1:
+        raise ValueError("Start point must be a 1D array.")
+
+    for _ in range(max_iters):
+        prev = point
+        for body in bodies:
+            point = body.closest_point(point)
+        if all(body.contains(point) for body in bodies):
+            return point
+        if np.linalg.norm(point - prev) < tol:
+            break
+    return point
+
 ArrayLikePoint = Iterable[float]
 
 
@@ -152,3 +184,20 @@ class ConvexPolygon(ConvexBody):
                 best_point = candidate
         assert best_point is not None
         return best_point
+
+
+@dataclass(frozen=True)
+class Intersection(ConvexBody):
+    """Intersection of multiple convex bodies."""
+
+    bodies: Sequence[ConvexBody]
+
+    def __post_init__(self) -> None:
+        if not self.bodies:
+            raise ValueError("Intersection requires at least one body.")
+
+    def contains(self, point: np.ndarray) -> bool:  # type: ignore[override]
+        return all(body.contains(point) for body in self.bodies)
+
+    def closest_point(self, previous_point: np.ndarray) -> np.ndarray:  # type: ignore[override]
+        return project_onto_intersection(self.bodies, previous_point)
