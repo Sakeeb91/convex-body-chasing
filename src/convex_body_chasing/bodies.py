@@ -2,9 +2,20 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Iterable, Tuple
+from typing import Iterable, Sequence, Tuple
 
 import numpy as np
+
+# Small numerical tolerance for containment checks and convergence.
+DEFAULT_TOL = 1e-9
+
+
+def _to_point(point: Iterable[float], *, dim: int) -> np.ndarray:
+    """Convert an iterable to a float numpy array and validate dimension."""
+    arr = np.asarray(point, dtype=float)
+    if arr.shape != (dim,):
+        raise ValueError(f"Expected point of shape ({dim},), got {arr.shape}.")
+    return arr
 
 ArrayLikePoint = Iterable[float]
 
