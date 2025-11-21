@@ -64,3 +64,29 @@ class Ball2D(ConvexBody):
         if distance == 0:
             return center_arr + np.array([self.radius, 0.0])
         return center_arr + direction / distance * self.radius
+
+
+@dataclass(frozen=True)
+class AxisAlignedRectangle(ConvexBody):
+    """Closed axis-aligned rectangle in R^2."""
+
+    min_corner: Tuple[float, float]
+    max_corner: Tuple[float, float]
+
+    def __post_init__(self) -> None:
+        lower = _to_point(self.min_corner, dim=2)
+        upper = _to_point(self.max_corner, dim=2)
+        if np.any(upper <= lower):
+            raise ValueError("Max corner must be strictly greater than min corner in each dimension.")
+
+    def contains(self, point: np.ndarray) -> bool:  # type: ignore[override]
+        pt = _to_point(point, dim=2)
+        lower = _to_point(self.min_corner, dim=2)
+        upper = _to_point(self.max_corner, dim=2)
+        return bool(np.all(pt >= lower - DEFAULT_TOL) and np.all(pt <= upper + DEFAULT_TOL))
+
+    def closest_point(self, previous_point: np.ndarray) -> np.ndarray:  # type: ignore[override]
+        pt = _to_point(previous_point, dim=2)
+        lower = _to_point(self.min_corner, dim=2)
+        upper = _to_point(self.max_corner, dim=2)
+        return np.clip(pt, lower, upper)
